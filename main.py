@@ -76,16 +76,17 @@ def generate_readme(file_data, project_type, model):
     if api == "mistral":
         # Call Mistral API to generate the README content
         logging.info("Calling Mistral API")
-        # response = mistral_client.chat.complete(
-        #     messages=[
-        #         {
-        #             "role": "user",
-        #             "content": prompt,
-        #         },
-        #     ],
-        #     model=model,
-        #     max_tokens=1500)
-        # response_content = response.choices[0].message.content
+        response = mistral_client.chat.complete(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+            model=model,
+            max_tokens=1500,
+            temperature=0.3)
+        response_content = response.choices[0].message.content
 
     else:
         # Call OpenAI API to generate the README content
@@ -97,23 +98,20 @@ def generate_readme(file_data, project_type, model):
         response = openai_client.chat.completions.create(
             model=model,
             messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
+                {"role": "user", "content": prompt},
+                {"role": "system", "content": "You are a DevOps expert in generating README files. Respecting best practices is crucial."},
             ],
             max_tokens=1500,
-            temperature=0.7,
+            temperature=0.3
         )
 
-        response_content = response_content = response.choices[0].message.content
-        print(response_content)
+        response_content = response.choices[0].message.content
 
     return response_content
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a README file for a given directory.")
-    parser.add_argument("--directory", required=True, help="Path to the directory to scan.",
+    parser.add_argument("--directory", help="Path to the directory to scan.",
                         default="/workspaces/Daisei/tests/ansible/ansible-role-docker-master")
     parser.add_argument("--model", default=os.getenv("OPENAI_MODEL", "mistral-large-latest"),
                         help="OpenAI model to use for generating the README.")
