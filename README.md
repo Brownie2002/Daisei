@@ -1,84 +1,67 @@
-Enter the directory to scan: /workspaces/Daisei/examples/terraform
-# Terraform AWS VPC Module
+# Python Project: README Generator
 
-This Terraform module creates a Virtual Private Cloud (VPC) on AWS. The module is designed to be flexible and configurable, allowing you to create a VPC with various configurations, including IPv6, network ACLs, VPC flow logs, secondary CIDR blocks, and more.
+This project provides a Python script (`main.py`) to scan directories and generate README files for Ansible roles and Terraform modules. The script uses the OpenAI API to analyze the files in a directory and create a README file that adheres to best practices for the identified project type.
 
 ## Features
 
-- **Flexible VPC Configuration**: Supports IPv4, IPv6, dual-stack, and secondary CIDR blocks.
-- **Network ACLs**: Configure network access control lists for fine-grained control.
-- **VPC Flow Logs**: Enable VPC flow logs for monitoring and troubleshooting.
-- **Manage Default VPC**: Option to manage the default VPC.
-- **Outposts**: Supports AWS Outposts for on-premises AWS infrastructure.
-- **Public Access Blocking**: Configure settings to block public access.
-- **Separate Route Tables**: Create separate route tables for different subnets.
-- **VPC Endpoints**: Create VPC endpoints for secure and private connections to AWS services.
+- **Directory Scanning**: Recursively scans a directory and its subdirectories to collect file data.
+- **Project Type Identification**: Automatically identifies whether the directory contains an Ansible role, a Terraform module, or an unknown project type.
+- **README Generation**: Generates a README file tailored to the project type using the OpenAI API.
 
 ## Prerequisites
 
-- Terraform 1.0.0 or later
-- AWS account and credentials
+- Python 3.x
+- OpenAI API key
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd <repository-directory>
+   ```
+3. Install the required Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ## Usage
 
-```hcl
-module "vpc" {
-  source = "/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master"
+1. Run the script and provide the directory to scan:
+   ```bash
+   python3 main.py
+   ```
+2. Enter the path to the directory you want to scan when prompted.
+3. The script will generate a `README.md` file in the specified directory.
 
-  name = "example-vpc"
-  cidr = "10.0.0.0/16"
+## How It Works
 
-  azs             = ["us-west-2a", "us-west-2b", "us-west-2c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+1. **Scanning**: The script reads all files in the specified directory and its subdirectories.
+2. **Project Type Detection**:
+   - If the directory contains Ansible-related files (e.g., `tasks/main.yml`), it identifies the project as an Ansible role.
+   - If the directory contains Terraform files (e.g., `.tf` files), it identifies the project as a Terraform module.
+   - Otherwise, it labels the project type as unknown.
+3. **README Generation**: The script uses the OpenAI API to generate a README file based on the project type and the collected file data.
 
-  enable_nat_gateway = true
-  enable_vpn_gateway = true
-}
-```
+## Example
 
-## Examples
+To generate a README for an Ansible role:
 
-This module includes several examples to illustrate different use cases:
+1. Place the Ansible role files in a directory (e.g., `my-ansible-role/`).
+2. Run the script and specify the directory path:
+   ```bash
+   python3 main.py
+   ```
+3. The script will create a `README.md` file in the `my-ansible-role/` directory.
 
-- [IPv6 Dualstack VPC](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/ipv6-dualstack)
-- [Network ACLs](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/network-acls)
-- [IPAM](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/ipam)
-- [Issues](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/issues)
-- [Manage Default VPC](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/manage-default-vpc)
-- [Simple VPC](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/simple)
-- [VPC Flow Logs](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/vpc-flow-logs)
-- [Complete VPC](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/complete)
-- [Outpost VPC](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/outpost)
-- [Block Public Access](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/block-public-access)
-- [Separate Route Tables](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/separate-route-tables)
-- [IPv6 Only VPC](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/ipv6-only)
-- [Secondary CIDR Blocks](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/examples/secondary-cidr-blocks)
+## Limitations
 
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|----------|
-| name | Name to be used on all the resources as identifier | `string` | n/a | yes |
-| cidr | The CIDR block for the VPC. | `string` | n/a | yes |
-| azs | A list of availability zones in the region | `list(string)` | n/a | yes |
-| private_subnets | A list of private subnets inside the VPC | `list(string)` | n/a | yes |
-| public_subnets | A list of public subnets inside the VPC | `list(string)` | n/a | yes |
-| enable_nat_gateway | Should be true to provision NAT Gateways for each of the private networks | `bool` | `false` | no |
-| enable_vpn_gateway | Should be true to create a new VPN Gateway resource and attach it to the VPC | `bool` | `false` | no |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| vpc_id | The ID of the VPC |
-| private_subnets | List of IDs of private subnets |
-| public_subnets | List of IDs of public subnets |
-| nat_gateway_ids | List of NAT Gateway IDs |
-| vpn_gateway_id | The ID of the VPN Gateway |
+- The script relies on the OpenAI API for README generation, so an active internet connection and a valid API key are required.
+- The generated README is based on the file structure and content; it does not invent details.
 
 ## License
 
-This module is licensed under the MIT License. See the [LICENSE](/workspaces/Daisei/examples/terraform/terraform-aws-vpc-master/LICENSE) file for more information.
-
-## Contributing
+This project is licensed under the MIT License. See the `LICENSE` file for details.
